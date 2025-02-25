@@ -14,9 +14,9 @@ dependencies:
     sdk: flutter
   uuid: ^3.0.6
 
-  firebase_core: ^2.8.0
-  firebase_analytics: ^10.1.6
-
+  firebase_core: ^2.24.2
+  firebase_analytics: ^10.8.0
+  cloud_firestore: ^4.14.0
 
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.5.2
@@ -34,4 +34,3 @@ flutter:
 
 
   uses-material-design: true
-

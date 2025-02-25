@@ -29,10 +29,64 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>todo_app</title>
+  <title>Todo App</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-analytics-compat.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyD36kzrLLdgJ_KakHgE3Maoqx-9X5R-ko8",
+      authDomain: "flutter-todo-app-f4f48.firebaseapp.com",
+      projectId: "flutter-todo-app-f4f48",
+      storageBucket: "flutter-todo-app-f4f48.appspot.com",
+      messagingSenderId: "820708750599",
+      appId: "1:820708750599:web:3e0f3fe8b2e3b683b101a2"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <script src="flutter.js" defer></script>
+  <script>
+    window.addEventListener('load', function() {
+      // Inject a service worker registration delay to prevent a race between service worker registration and flutter initialization
+      _flutter = {};
+      _flutter.loader = {
+        loadEntrypoint: function(options) {
+          return Promise.resolve();
+        }
+      };
+
+      window.flutterWebRenderer = "html";
+      
+      let scriptLoaded = false;
+      function loadMainDartJs() {
+        if (scriptLoaded) {
+          return;
+        }
+        scriptLoaded = true;
+        var scriptTag = document.createElement('script');
+        scriptTag.src = 'main.dart.js';
+        scriptTag.type = 'application/javascript';
+        document.body.append(scriptTag);
+      }
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('flutter-first-frame', function () {
+          navigator.serviceWorker.register('flutter_service_worker.js');
+        });
+      }
+
+      // Download main.dart.js
+      loadMainDartJs();
+    });
+  </script>
 </body>
 </html>

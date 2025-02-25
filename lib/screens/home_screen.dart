@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import '../models/task.dart';
 import 'package:uuid/uuid.dart';
-import '../services/storage_service.dart';
+import '../services/firebase_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,13 +22,43 @@ class _HomeScreenState extends State<HomeScreen> {
   // UUID generator
   final Uuid _uuid = const Uuid();
 
-  // Storage service
-  final _storageService = StorageService();
+  // Firebase service
+  final _firebaseService = FirebaseService();
 
-  // Save tasks to storage
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTasks();
+  }
+
+  // Load tasks from Firebase
+  Future<void> _loadTasks() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final tasks = await _firebaseService.loadTasks();
+      setState(() {
+        _tasks.clear();
+        _tasks.addAll(tasks);
+      });
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error loading tasks: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // Save tasks to Firebase
   Future<void> _saveTasks() async {
     try {
-      await _storageService.saveTasks(_tasks);
+      await _firebaseService.saveTasks(_tasks);
     } catch (e) {
       // ignore: avoid_print
       print('Error saving tasks: $e');
@@ -122,32 +152,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // Task list
           Expanded(
-            child: _tasks.isEmpty
-                ? const Center(child: Text('No tasks yet!'))
-                : ListView.builder(
-                    itemCount: _tasks.length,
-                    itemBuilder: (context, index) {
-                      final task = _tasks[index];
-                      return ListTile(
-                        leading: Checkbox(
-                          value: task.isCompleted,
-                          onChanged: (_) => _toggleTask(task.id),
-                        ),
-                        title: Text(
-                          task.title,
-                          style: TextStyle(
-                            decoration: task.isCompleted
-                                ? TextDecoration.lineThrough
-                                : null,
-                          ),
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () => _deleteTask(task.id),
-                        ),
-                      );
-                    },
-                  ),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _tasks.isEmpty
+                    ? const Center(child: Text('No tasks yet!'))
+                    : ListView.builder(
+                        itemCount: _tasks.length,
+                        itemBuilder: (context, index) {
+                          final task = _tasks[index];
+                          return ListTile(
+                            leading: Checkbox(
+                              value: task.isCompleted,
+                              onChanged: (_) => _toggleTask(task.id),
+                            ),
+                            title: Text(
+                              task.title,
+                              style: TextStyle(
+                                decoration: task.isCompleted
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () => _deleteTask(task.id),
+                            ),
+                          );
+                        },
+                      ),
           ),
         ],
       ),
