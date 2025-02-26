@@ -13,6 +13,8 @@ dependencies:
   flutter:
     sdk: flutter
   uuid: ^3.0.6
+  flutter_local_notifications: 18.0.1
+
 
   firebase_core: ^2.24.2
   firebase_analytics: ^10.8.0

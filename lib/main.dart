@@ -4,6 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:todo_app/screens/home_screen.dart';
 import 'firebase_options.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'services/notification_service.dart';
+
+late NotificationService notificationService;
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -16,6 +21,10 @@ void main() async {
 
   // Initialize shared preferences
   await SharedPreferences.getInstance();
+
+  // Initialize Notifications
+  notificationService = NotificationService();
+  await notificationService.initialize();
 
   runApp(const TodoApp());
 }
